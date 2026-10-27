@@ -1,0 +1,60 @@
+name: Sync Gitee
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: sync-gitee
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.event.deleted != true
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Push main and version tags to Gitee
+        shell: bash
+        env:
+          GITEE_SYNC_TOKEN: ${{ secrets.GITEE_SYNC_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$GITEE_SYNC_TOKEN" ]]; then
+            echo 'GITEE_SYNC_TOKEN is not configured' >&2
+            exit 1
+          fi
+
+          # Git prompts through this helper; the token never enters a URL or command argument.
+          umask 077
+          askpass=$(mktemp "$RUNNER_TEMP/gitee-askpass.XXXXXX")
+          cat >"$askpass" <<'EOF'
+          #!/bin/sh
+          case "$1" in
+            *sername*) printf '%s\n' oauth2 ;;
+            *assword*) printf '%s\n' "$GITEE_SYNC_TOKEN" ;;
+            *) exit 1 ;;
+          esac
+          EOF
+          chmod 700 "$askpass"
+          trap 'rm -f "$askpass"' EXIT
+          export GIT_ASKPASS="$askpass" GIT_TERMINAL_PROMPT=0
+
+          workdir=$(mktemp -d "$RUNNER_TEMP/gitee-repo.XXXXXX")
+          git -C "$workdir" init --quiet
+          git -C "$workdir" remote add github \
+            https://github.com/ye-kaifan/local-codex-context-bridge.git
+          git -C "$workdir" fetch --quiet --tags github \
+            refs/heads/main:refs/remotes/github/main
+
+          mapfile -t tag_refs < <(git -C "$workdir" for-each-ref \
+            --format='%(refname):%(refname)' refs/tags)
+          git -C "$workdir" push \
+            https://gitee.com/ye-kaifan/local-codex-context-bridge.git \
+            refs/remotes/github/main:refs/heads/main "${tag_refs[@]}"
+
+          echo "Synced main $(git -C "$workdir" rev-parse refs/remotes/github/main) and ${#tag_refs[@]} tag(s)"
