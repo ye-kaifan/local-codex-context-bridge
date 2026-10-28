@@ -49,6 +49,20 @@ The home existing is not proof it contains the intended sessions: verify a known
 session through the tools. Windows must use native `codex.exe`, not `codex.cmd`.
 See [Windows notes](windows/README.md).
 
+The schema check uses `.local/device.json` when present, so it checks the same
+executable selected by setup. With `--out NEW_DIRECTORY`, pass that configuration
+to both checks:
+
+```sh
+npm run check:native-schema -- --config NEW_DIRECTORY/device.json
+npm run smoke -- --config NEW_DIRECTORY/device.json
+```
+
+Before setup, `check:native-schema` detects Codex from PATH/CODEX_EXE; use
+`--codex ABSOLUTE_EXECUTABLE` to qualify an explicit binary without a device config.
+An unreadable/invalid config or missing configured executable fails without silently
+falling back to another installation.
+
 `.local/command.json` contains the absolute Node command, arguments and working
 directory. `.local/mcp.json` is an example stdio MCP configuration. Always launch
 Node directly for MCP. Do not add this reader to Codex's own MCP configuration for
@@ -62,7 +76,7 @@ node scripts/compare-native.mjs --config .local/device.json --thread EXISTING_TH
 ```
 
 The second script compares one native turn/item page and cursors with the bridge
-result without printing content. Choose a stable completed session because concurrent
+result. A mismatch reports only the page/field name, never actual/expected content. Choose a stable completed session because concurrent
 edits can invalidate a comparison. Smoke follows at most one continuation in each
 range; it does not claim a complete history audit. A protected failure is a real
 verification limit; reduce the page size or report it, never change to exact implicitly.
@@ -70,7 +84,7 @@ verification limit; reduce the page size or report it, never change to exact imp
 ## 3. Connect the owner's Chat and Dot
 
 Consult the current official [Secure MCP Tunnel guide](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels)
-and [custom MCP connection guide](https://developers.openai.com/api/docs/guides/custom-mcp-server).
+and [custom MCP connection guide](https://developers.openai.com/plugins/deploy/connect-chatgpt).
 Install the official [tunnel-client](https://github.com/openai/tunnel-client) separately;
 inspect its current CLI help rather than assuming an old binary's flags still work.
 The following profile format matches the integration this project derives from.

@@ -57,3 +57,13 @@ checker assumed a direct string cursor type and failed on Codex's additive union
 reference/union traversal corrected the check without changing runtime pagination.
 An npm pack attempt hit the task's cache sandbox restriction; using a task-local
 cache resolved it without changing ownership or permissions in the user's home.
+
+## Additional regression coverage
+
+The follow-up tests exercise malformed list cursors and mismatched thread/turn
+identities, payload-free comparison/parse failures, configured executable selection,
+MCP broken pipes, split oversized frames and concurrency limits. A disposable native
+process records the wire methods and verifies child exit without loading real sessions.
+The mirror regression executes the workflow shell against local Git repositories
+with network protocols disabled. These fixtures do not establish Windows desktop,
+Chat/Dot cloud or live Gitee-write acceptance.

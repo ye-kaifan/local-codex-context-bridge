@@ -675,8 +675,10 @@ export class AppServerManager {
         if (this.#fatal) {
           return;
         }
-      } catch (error) {
-        this.#protocolFailure(`invalid app-server JSONL: ${messageFromUnknown(error)}`);
+      } catch {
+        // JSON.parse diagnostics can quote the rejected frame, including native
+        // session content. A protocol failure must not return that payload.
+        this.#protocolFailure("invalid app-server JSONL or message shape; native payload withheld");
         return;
       }
     }

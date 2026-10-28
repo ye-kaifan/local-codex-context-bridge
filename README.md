@@ -64,7 +64,7 @@ Keep the original source, query and cursor scope. Read turns, then items; only `
 | Linux / WSL | Not supported in this release; rejected explicitly. |
 | Chat / Dot | Current portable schemas retain the deployed compatibility fixes. This new generic package requires end-to-end acceptance on each user's private connection. |
 
-The required native methods/fields matter more than a version comparison. Run `npm run check:native-schema`; upgrading Codex may change its experimental APIs. [Protocol notes](PROTOCOL-ASSUMPTIONS.md) describe the contract and limits. [Verification](docs/verification.md) distinguishes deterministic, real-native and unexecuted checks.
+The required native methods/fields matter more than a version comparison. Run `npm run check:native-schema` (it uses the configured executable in `.local/device.json`); for another setup directory pass `-- --config PATH_TO_DEVICE_JSON`. Upgrading Codex may change its experimental APIs. [Protocol notes](PROTOCOL-ASSUMPTIONS.md) describe the contract and limits. [Verification](docs/verification.md) distinguishes deterministic, real-native and unexecuted checks.
 
 ## Development
 
@@ -85,3 +85,5 @@ The repository contains source and install guidance. It is **not** a publicly ho
 development/build/tests use the Git checkout above. To use the unpacked runtime
 archive, run `node scripts/setup.mjs` from its `package/` directory; no npm runtime
 dependencies are needed. Generated `.local/` files are never included in the archive.
+
+For maintainer-only GitHub → Gitee synchronization, see [mirror scope and recovery](docs/mirroring.md). This does not configure a user's own mirror or credentials.

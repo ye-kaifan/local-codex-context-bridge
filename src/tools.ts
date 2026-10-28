@@ -314,6 +314,9 @@ export class ControlSurface {
         ...(kind === "turns" ? { itemsView } : {}),
       },
     ), limit, kind);
+    if (kind === "items" && page.data.some(entry => (entry as Record<string, unknown>).turnId !== turnId)) {
+      throw new Error("history_upstream_invalid: item page does not belong to the requested turn");
+    }
     return exactHistoryResponse({
       source: "codex_app_server",
       mode: "history",
@@ -375,7 +378,11 @@ export class ControlSurface {
         threadId,
         includeTurns: false,
       });
-      return sanitizeForTransport({ source: "codex_app_server", mode: "read", ...responseRecord(result, "thread/read") });
+      const metadata = responseRecord(result, "thread/read");
+      if (asObject(metadata.thread, "thread/read result.thread").id !== threadId) {
+        throw new Error("thread_upstream_invalid: metadata does not identify the requested thread");
+      }
+      return sanitizeForTransport({ ...metadata, source: "codex_app_server", mode: "read" });
     }
     if (Object.hasOwn(args, "include_turns")) {
       throw new Error("include_turns is valid only with thread_id");
@@ -408,14 +415,24 @@ export class ControlSurface {
       ...(sourceKinds !== undefined ? { sourceKinds } : {}),
     });
     const page = responseRecord(result, "thread/list");
-    if (!Array.isArray(page.data)) {
-      throw new Error("thread/list returned no data array");
+    if (!Array.isArray(page.data) || page.data.length > limit || page.data.some(value => {
+      const thread = asObject(value, "thread/list entry");
+      return typeof thread.id !== "string" || !thread.id.trim();
+    })) {
+      throw new Error("thread_upstream_invalid: invalid thread/list data or identity");
+    }
+    for (const key of ["nextCursor", "backwardsCursor"]) {
+      // Native list cursors are optional. Preserve the established absent/null
+      // normalization, but never turn an invalid supplied cursor into exhaustion.
+      if (page[key] !== undefined && page[key] !== null && (typeof page[key] !== "string" || !(page[key] as string).trim())) {
+        throw new Error("thread_upstream_invalid: invalid thread/list cursor; cannot infer end of range");
+      }
     }
     return {
       source: "codex_app_server",
       mode: "list",
-      nextCursor: typeof page.nextCursor === "string" ? page.nextCursor : null,
-      backwardsCursor: typeof page.backwardsCursor === "string" ? page.backwardsCursor : null,
+      nextCursor: page.nextCursor ?? null,
+      backwardsCursor: page.backwardsCursor ?? null,
       data: page.data.map((thread) => sanitizeForTransport(thread, {
         maxStringChars: 4_000,
         maxDepth: 6,

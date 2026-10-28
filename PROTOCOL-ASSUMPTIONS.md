@@ -21,11 +21,15 @@ Qualification is version-sensitive; method presence alone is not full compatibil
   envelope is validated, then the final device-wrapped frame is checked again. A
   protected, structural or size failure returns no partial data or cursor. Search
   uses a 256 KiB result-body bound and validates native identities/UTF-16 match ranges.
-- Metadata/list projections use upstream bounded sanitization; they are distinct
+- Metadata/list projections use upstream bounded sanitization; list identity/limit and
+  supplied cursor types are validated first. Optional absent list cursors normalize to
+  null; invalid supplied cursors fail. Metadata must match the requested thread, and
+  item pages must match the requested turn. These projections are distinct
   from lossless history. Search locates user/final-assistant text, not every tool item,
   and its filters are not workspace ACLs or semantic relevance ranking.
 - MCP success lives in `structuredContent`, with a tiny text marker. Inputs are bounded
-  JSONL; initialize may repeat. Tool schemas are flat for client compatibility, but
+  JSONL; initialize may repeat. Broken input/output closes the owned native child
+  and stops new requests; no transcript payload is included in shutdown diagnostics. Tool schemas are flat for client compatibility, but
   conditional arguments and nonblank strings remain validated server-side. Eight
   redundant nonblank patterns are removed only from the published schema adapter.
 - Device context stays in the wrapper. A native error/offline source is not a successful

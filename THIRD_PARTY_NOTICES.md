@@ -11,9 +11,11 @@ Copyright (c) 2026 Local Codex Bridge contributors. MIT License. The original
 [LICENSE](LICENSE) is retained verbatim. New modifications are also MIT licensed:
 Copyright (c) 2026 ye-kaifan and Local Codex Context Bridge contributors.
 
-`upstream-files.json` records SHA-256 hashes of the unchanged shared core files.
+`upstream-files.json` records SHA-256 hashes of the unchanged shared core files
+and the upstream hash of the modified app-server transport. That transport now
+suppresses raw frame contents in parse/shape error diagnostics.
 `src/tools.ts` selects the three read-only schemas, validators and handlers from
-upstream. Relevant exact JSON, history, search and platform tests are adapted;
+upstream, with additional thread/turn identity and list-cursor validation. Relevant exact JSON, history, search and platform tests are adapted;
 writer/observe-only tests are excluded. Shared process/runtime support remains
 internal; its mutation-capable public tool router and executable are not shipped.
 The only published server constructs a read-only native manager.

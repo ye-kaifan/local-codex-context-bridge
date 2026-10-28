@@ -19,7 +19,7 @@ function portableProperties(name,properties){
   }));
 }
 export const INSTRUCTIONS='Read-only Codex context across configured devices. Search/list without device_id queries all configured devices. Always report each unavailable device; never equate unavailable with no matches. Results retain native per-device cursors. Continue each page with that device_id and its original cursor. History and occurrence search require device_id. Read turns, then items in each turn until nextCursor:null when full history is requested. Never automatically switch protected to exact.';
-export const CATALOG=[{name:'codex_devices',title:'Codex devices',description:'List configured device names and current availability. Use this to disambiguate a computer or explain incomplete search coverage.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations},
+export const CATALOG=[{name:'codex_devices',title:'Codex devices',description:'List device names and configuration status. Native availability requires a successful read. Use this to disambiguate a computer or explain incomplete search coverage.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations},
   ...['codex_threads','codex_history','codex_search'].map(name=>{
     const native=TOOL_DEFINITIONS.find(tool=>tool.name===name);
     // Flat schemas keep base arguments intact in ChatGPT/Codex schema conversion.

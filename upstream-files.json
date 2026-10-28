@@ -3,7 +3,6 @@
   "commit": "5f20b24940ed3024ed10d6ca45498f30f9750ea9",
   "version": "2.3.4",
   "unmodified_files_sha256": {
-    "src/app-server.ts": "e7b8f4e22e44c82646dff87996433a626bab58f3338cb47de5a7414bcbb13a45",
     "src/runtime.ts": "5dd200fb092bdf72bb99440e1eea0d85307fd9213d4171c2ee1b424ba7f00804",
     "src/redaction.ts": "c13fdfc8d86f7809c35dba751333b6f79b7b822725187206d68241064ee90593",
     "src/exact-json.ts": "649efbf15bc147e9f6e261e90c5a3ba9035d4c6ac0dd5353d1ac817d6119c033",
@@ -16,5 +15,11 @@
     "src/compact-schema.ts": "ebb6428f369327fd70dee600544e22470cde0db1f208eacb386d82cc1819c5a1",
     "src/compact-shape.ts": "6d6143cf5b204cfd5fd17aef87f462314f980ba2b3b93c026f7c86f9aa5d177b",
     "src/ux-projection.ts": "705e9405394dffca91a72562de2cd562c1e2a86e383cce2d5404282bc9db3037"
+  },
+  "modified_files": {
+    "src/app-server.ts": {
+      "upstream_sha256": "e7b8f4e22e44c82646dff87996433a626bab58f3338cb47de5a7414bcbb13a45",
+      "change": "Suppress native frame contents in JSONL parse/shape error diagnostics."
+    }
   }
 }

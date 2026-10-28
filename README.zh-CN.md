@@ -46,3 +46,7 @@ npm run smoke
 macOS Apple Silicon 已做真实原生读取验证。Windows 有共享代码和 CI 测试，但真实 Codex、后台服务和 Chat/Dot 接入仍需在目标机验收。Linux/WSL 暂不支持。当前通用包没有替换维护者的现有安装，也没有借用旧会话中的“测试通过”作为本次发布验收。
 
 [安装、卸载与恢复](INSTALL.md) · [安全模型](docs/security.md) · [验证范围](docs/verification.md) · [英文说明](README.md)
+
+`npm run check:native-schema` 会优先检查 `.local/device.json` 中实际配置的 Codex。使用其他配置目录时，加 `-- --config 配置目录/device.json`，避免误检 PATH 中另一份安装。
+
+维护者的 GitHub → Gitee 单向同步范围与故障恢复见 [镜像说明](docs/mirroring.md)。

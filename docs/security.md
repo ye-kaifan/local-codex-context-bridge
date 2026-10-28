@@ -19,7 +19,9 @@ positives on ordinary source code; it cannot detect every secret. Explicit exact
 mode returns unchanged native text for that call and may reveal sensitive content.
 Never switch automatically after a refusal. Oversized pages fail, without a partial
 result or cursor. Try a smaller page; a single oversized legacy turn cannot be split
-by this bridge. Metadata/list sanitization has a different, bounded contract.
+by this bridge. Metadata/list sanitization has a different, bounded contract. Native comparison
+failures report only a fixed page/field label, never actual/expected transcript data.
+Malformed native JSONL/shape errors also omit raw frame and parser-excerpt contents.
 
 The native child's environment is allowlisted: OS/path/locale variables and the
 explicit Codex home. Tunnel/API secrets are not inherited. The home may already
