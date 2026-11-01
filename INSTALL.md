@@ -153,27 +153,66 @@ because local files exist. Each unavailable device must be reported separately.
 
 A cloud-installed plugin may also become visible in Codex. To prevent its broad
 context-reading skill/tools from diverting Codex's native session access, disable
-**only this installation's** plugin, registered device apps and bundled skills in
-each computer's local Codex configuration. Keep the cloud Chat/Dot connection enabled.
-Do not globally uninstall the plugin or disable unrelated apps/skills.
+**only this installation's** plugin, registered device connectors (apps) and bundled
+skills in each computer's **LOCAL Codex** configuration. Keep the ordinary cloud
+Chat/Dot connection and background readers enabled. Do not globally uninstall the
+plugin, stop its Tunnel/reader service, or disable unrelated apps/skills.
 
-Resolve the actual local plugin identifier, device app IDs and installed skill folder
-paths using supported plugin management and local configuration. Generate a fragment:
+Resolve the actual local plugin identifier, device app IDs and **all currently
+discovered installed skill paths**, including every relevant version in the plugin
+cache, using supported plugin management and skill listing for the intended cwd.
+Do not copy another machine's IDs or assume a versioned cache path stays fixed.
+If a skill listing reports `pluginId: null`, do not assume a plugin-level flag alone
+disables it; verify and disable that skill by its actual file path as well.
+
+Generate a fragment with actual absolute paths (quote paths containing spaces):
 
 ```sh
-node scripts/isolation.mjs --plugin ACTUAL_PLUGIN_ID --app ACTUAL_DEVICE_APP_ID --skill ABSOLUTE_INSTALLED_SKILL_FOLDER --out .local/codex-isolation.toml
+node scripts/isolation.mjs --plugin ACTUAL_PLUGIN_ID --app ACTUAL_DEVICE_APP_ID --skill "ABSOLUTE_INSTALLED_SKILL_DIRECTORY" --skill "ABSOLUTE_OTHER_INSTALLED_VERSION/SKILL.md" --out .local/codex-isolation.toml
 ```
 
-Repeat `--app`/`--skill` as needed. The script only writes a fragment. Back up the actual
+Repeat `--app`/`--skill` for this installation's connectors and every discovered skill
+version. `--skill` accepts an existing absolute directory **containing a regular
+`SKILL.md` file**, or that file's explicit absolute path. The script checks existence
+and file type, resolves directory inputs to `SKILL.md`, and deduplicates normalized
+file paths. Missing/relative paths and other file names are rejected before output
+is created. Output always uses file paths, not directory-only overrides. The official
+[skill disable example](https://learn.chatgpt.com/docs/build-skills) uses the complete
+`SKILL.md` path; directory-only overrides have failed in observed local installations.
+
+The script writes a new fragment with no-clobber protection; it never reads or edits
+the running Codex configuration and does not discover caches automatically. Back up the actual
 Codex `config.toml` privately, then merge these exact `enabled=false` settings using a
 TOML-aware editor. If matching tables/array entries exist, update them; **do not append
 duplicate tables** or replace the full configuration. Consult the current
 [Codex configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference).
 Record previous values for targeted recovery. No config or backup belongs in Git.
 
-Open a fresh Codex process/chat and verify the plugin tools and skills are absent,
-while supported native session reading still works. Then verify ordinary Chat and
-Dot still use the private reader. Changing only a skill description is insufficient.
+Verify local isolation and cloud access **separately**:
+
+1. Restart the local Codex client/process so it reloads configuration. For supported
+   app-server skill inspection, refresh `skills/list` with `forceReload: true` for the
+   actual cwd and check each relevant file is `enabled: false`. A stale listing is
+   not evidence. See the [official app-server skill API](https://learn.chatgpt.com/docs/app-server).
+2. Open a **genuinely new LOCAL Codex chat** after the restart. Verify this reader's
+   plugin tools and bundled skills are absent/disabled, then use the supported native
+   history interface to locate a known completed session and read its history with
+   actual turn/item continuation where available. Do not route this check through
+   this plugin. An already-open chat can retain injected skills/context and is not
+   proof that the new configuration worked.
+3. In a new ordinary cloud Chat and a Dot, keep the private reader enabled. Confirm
+   the source device, search for a known session, read history and follow the actual
+   turn/item cursors. Local native-history success does not establish cloud-reader
+   acceptance, and a healthy background service alone proves neither.
+
+Report each result as passed, failed or not run, with the client/OS and scope tested.
+Do not substitute an older Mac report, path-semantics fixtures or another device's
+result for a fresh-chat test. Changing only a skill description is insufficient.
+
+After any plugin upgrade or reinstall, **rediscover the installed paths and repeat
+these checks**. A cache move such as `2.1.0` to `2.1.1` makes an old file-path override
+insufficient for the new location. Regenerate into a new output file, review and merge
+the newly discovered paths, and reverify. There is no automatic future-version guarantee.
 
 ## 6. Optional background operation
 
@@ -182,6 +221,13 @@ service, the same account/home, absolute paths, private logs and the OS credenti
 store. Do not alter the existing production service during a parallel installation.
 
 ### macOS
+
+Local isolation follows section 5 and is independent of LaunchAgent operation.
+Resolve the current user's actual plugin cache and complete `SKILL.md` paths; do not
+reuse another Mac's home or a previous version's cache directory. Keep the existing
+reader/Tunnel LaunchAgent running during local isolation, then perform both the new
+local-chat and ordinary cloud Chat/Dot checks. The watcher self-test below does not
+verify plugin isolation.
 
 The optional source watcher uses AppKit to follow a **detected bundle ID**, not a
 hardcoded app name. The bundle differs between distributions; inspect the actual app's
@@ -229,6 +275,7 @@ shipped; do not present Windows CI as proof of a working desktop service.
   backup restore is appropriate only if no later unrelated config edits would be lost.
 - To update, retain the previous checkout/config until the new checkout passes local
   tests and private Chat/Dot acceptance. Regenerate commands with the new absolute path,
+  rediscover versioned bundled skill paths and reverify section 5's local isolation,
   then deliberately switch the service. To recover, stop the new service and point it
   back to the previous verified checkout/config. Do not roll back Standard scheduling
   merely to match an old plist.

@@ -67,3 +67,19 @@ process records the wire methods and verifies child exit without loading real se
 The mirror regression executes the workflow shell against local Git repositories
 with network protocols disabled. These fixtures do not establish Windows desktop,
 Chat/Dot cloud or live Gitee-write acceptance.
+
+## Isolation regression scope
+
+`test/isolation.test.mjs` uses disposable synthetic skill directories/files and CLI
+invocations to check file-path output, duplicate aliases, spaces, multiple installed
+versions, invalid/missing paths and no-clobber behavior. It also models Windows
+drive/UNC/case/separator and macOS POSIX path semantics with synthetic filesystem
+entries. Those models do not constitute execution on both operating systems.
+
+Passing these tests proves neither runtime configuration loading nor a fresh local
+chat or cloud Chat/Dot history flow. Follow INSTALL.md section 5 on each target
+computer: rediscover all installed skill cache versions, verify disabled files after
+reload, open a genuinely new LOCAL Codex chat for native history, and separately
+exercise reader history in ordinary cloud Chat and Dot. Record passed, failed and
+not-run results separately. Older private results do not qualify the current change;
+cache paths that change on update require rediscovery and repeat verification.

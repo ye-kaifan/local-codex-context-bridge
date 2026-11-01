@@ -13,11 +13,18 @@ Install https://github.com/ye-kaifan/local-codex-context-bridge for read-only
 Codex context in ChatGPT Chat and Dot. Read INSTALL.md and follow it end to end.
 Detect my OS, actual Codex executable/home and existing connections; preserve
 my current installation and settings. Build and test locally, then help connect
-my own private Secure MCP Tunnel and configure Codex-local plugin isolation.
+my own private Secure MCP Tunnel. Isolate only LOCAL Codex from this plugin,
+its registered device connectors and every actually discovered bundled SKILL.md.
+Keep the ordinary Chat/Dot connection and background readers running; do not
+globally uninstall the plugin. Discover current plugin/app IDs and all installed
+skill cache versions; use existing absolute SKILL.md files, not directory-only
+overrides. Rediscover and reverify after a plugin update changes cache paths.
 Pause for my login, secret entry or approval of new account permissions. Do not
 create credentials, expose public ports, or change unrelated settings silently.
-Verify real read-only search and native turn/item continuation; report what
-passed and what still needs manual action.
+Restart local Codex and open a genuinely new local chat to verify native history
+and absence of this plugin's tools/skills. Separately verify cloud Chat and Dot
+search and turn/item continuation through the reader. Report each as passed,
+failed or not run; old chats and simulated path tests do not prove acceptance.
 ```
 
 ## Local quick start
@@ -39,6 +46,14 @@ Setup creates a **new** `.local/` directory with `device.json`, `mcp.json` and `
 The generated `command.json` is the stdio command for your MCP client or Tunnel. Launch **Node directly**, never `npm start` behind MCP: npm's lifecycle output is not JSON-RPC. Local setup does not install a cloud plugin, start a background service, change Codex settings, or create credentials.
 
 [INSTALL.md](INSTALL.md) covers Chat/Dot connection, multiple devices, optional macOS app lifecycle, Windows background setup, Codex isolation, uninstall and recovery.
+
+Local isolation disables only this reader's plugin, device connectors and bundled
+skills in **LOCAL Codex**. It keeps ordinary Chat/Dot access and background readers
+enabled. The fragment generator accepts an existing absolute skill directory or
+`SKILL.md` file and emits the file path; repeat `--skill` for every discovered cache
+version. It never edits Codex settings. Follow the separate new-local-chat and cloud
+history checks in [the isolation runbook](INSTALL.md#5-isolate-the-reader-from-codexs-native-tools),
+including rediscovery after cache paths change on update.
 
 ## What it exposes
 

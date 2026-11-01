@@ -10,6 +10,27 @@ shim cannot be spawned directly by this reader. If necessary inspect the install
 `@openai/codex-*` package's vendor directory, then run that exact binary with
 `--version` and `app-server --help` before passing it to setup.
 
+For LOCAL Codex isolation, follow [INSTALL.md section 5](../INSTALL.md#5-isolate-the-reader-from-codexs-native-tools).
+Disable only this reader's local plugin, related device connectors and bundled
+skills; keep ordinary Chat/Dot connections and the background task/reader running.
+Discover all actually installed plugin cache versions. Pass a fully qualified drive
+or UNC path to each existing skill directory or `SKILL.md` file and quote spaces:
+
+```powershell
+node scripts/isolation.mjs --plugin ACTUAL_PLUGIN_ID --app ACTUAL_DEVICE_APP_ID --skill 'C:\Users\example\Plugin Cache\VERSION\skills\read-context' --skill 'C:\Users\example\Plugin Cache\OTHER_VERSION\skills\read-context\SKILL.md' --out .local/codex-isolation.toml
+```
+
+These paths are placeholders; replace them with discovered paths, not assumed cache
+locations. Directory inputs become full `SKILL.md` paths in the fragment. Drive-relative
+(`C:skill`) and root-relative (`\skill` or `/skill`) paths are rejected. Review the new
+fragment, back up and merge only its targeted entries; the generator does not change
+runtime settings. After upgrades that move the cache, rediscover paths and reverify.
+
+Restart local Codex and open a genuinely new local chat to check that these tools
+and skills are disabled and native history works. Separately check reader search
+and turn/item continuation in ordinary cloud Chat and Dot. Report unrun checks as
+not run. Windows path fixtures or an already-open chat do not prove this acceptance.
+
 For optional background operation, first test the foreground Tunnel. Store its
 runtime key using Windows Credential Manager or a SecureString encrypted with
 current-user DPAPI (`ConvertFrom-SecureString` without an explicit key). Have the
