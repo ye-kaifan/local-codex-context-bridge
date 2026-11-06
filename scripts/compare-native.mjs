@@ -4,6 +4,7 @@ import { pathToFileURL } from 'node:url';
 import { ReadOnlyAppServer } from '../bridge/readonly-policy.mjs';
 import { nativeEnvironment } from '../bridge/native.mjs';
 import { readConfig } from '../bridge/config.mjs';
+import { resolveNativeExecutable } from '../bridge/executable.mjs';
 import { ControlSurface } from '../dist/src/tools.js';
 // AssertionError includes actual/expected transcript data in stderr. Only report
 // the fixed page/field name when comparison fails; never attach either payload.
@@ -18,7 +19,9 @@ async function main() {
   const { values } = parseArgs({ options: { config: { type: 'string' }, thread: { type: 'string' } } });
   if (!values.config || !values.thread) throw new Error('Supply --config and --thread for a stable existing thread');
   const config = await readConfig(values.config);
-  const manager = new ReadOnlyAppServer(undefined, { executable: config.native?.executable, environment: nativeEnvironment(config.native), requestTimeoutMs: 20000, prefixArgs: ['-c', 'sandbox_mode="read-only"', '-c', 'analytics.enabled=false'] });
+  const environment = nativeEnvironment(config.native);
+  const codex = await resolveNativeExecutable(config.native, environment);
+  const manager = new ReadOnlyAppServer(undefined, { executable: codex.path, environment, requestTimeoutMs: 20000, prefixArgs: ['-c', 'sandbox_mode="read-only"', '-c', 'analytics.enabled=false'] });
   try {
     const surface = new ControlSurface(manager);
     const page = await surface.call('codex_history', { thread_id: values.thread, kind: 'turns', limit: 1, content_policy: 'protected' });

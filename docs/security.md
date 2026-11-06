@@ -49,3 +49,14 @@ secret forms, personal absolute paths and upstream hashes; a separate secret sca
 and human review supplement it. These checks are evidence, not proof of perfect
 secret detection. Report security issues privately to the repository maintainer
 before attaching any transcript, credential or personal configuration.
+
+## Upgrade-aware executable selection
+
+Legacy and explicit executable pins have no fallback. New stable-path selectors
+re-resolve only the selected lexical path. Opt-in Windows package selectors require
+one healthy registration for the exact family under the current OS user and a
+canonical executable inside that installation. Discovery fixes the Codex home and
+never scans sessions, other accounts or arbitrary version directories. Version and
+package probes run without a shell, with time/output bounds and filtered
+environments. Their output is not a cryptographic authenticity check. Read the
+[trust assumptions and failure contract](executable-updates.md) before opting in.

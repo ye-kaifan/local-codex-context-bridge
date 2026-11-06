@@ -4,26 +4,30 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
-import { findCodex } from './setup.mjs';
+import { findCodex, resolveNativeExecutable } from '../bridge/executable.mjs';
+import { nativeEnvironment } from '../bridge/environment.mjs';
 import { READ_METHODS } from '../bridge/readonly-policy.mjs';
 import { readConfig } from '../bridge/config.mjs';
-export async function selectSchemaCodex(options = {}, finder = findCodex) {
+export async function selectSchemaCodex(options = {}, finder = findCodex, resolver = resolveNativeExecutable) {
   if (options.codex && options.config) throw new Error('Choose --config or --codex, not both');
-  if (options.codex) return finder(options.codex);
+  const initialEnvironment = nativeEnvironment({ codex_home: process.env.CODEX_HOME });
+  if (options.codex) return { ...await finder(options.codex, initialEnvironment), environment: initialEnvironment };
   const configPath = options.config || resolve(dirname(fileURLToPath(import.meta.url)), '../.local/device.json');
   let config;
   try { config = await readConfig(configPath); }
   catch (error) {
     if (error.code !== 'ENOENT' || options.config) throw error;
-    return finder(); // No installation yet: qualify the detected executable.
+    return { ...await finder(process.env.CODEX_EXE, initialEnvironment), environment: initialEnvironment }; // No installation yet.
   }
-  if (!config.native?.executable) throw new Error('Device config must identify the actual native executable');
-  return finder(config.native.executable);
+  if (!config.native?.executable && !config.native?.executable_source) throw new Error('Device config must identify the actual native executable');
+  const environment = nativeEnvironment(config.native);
+  if (config.native.executable_source) return { ...await resolver(config.native, environment), environment };
+  return { ...await finder(config.native.executable, environment), environment };
 }
 export async function checkNativeSchema(codex) {
   const dir = await mkdtemp(join(tmpdir(), 'context-schema-'));
   try {
-    const result = spawnSync(codex.path, ['app-server', 'generate-json-schema', '--experimental', '--out', dir], { encoding: 'utf8', timeout: 30000 });
+    const result = spawnSync(codex.path, ['app-server', 'generate-json-schema', '--experimental', '--out', dir], { encoding: 'utf8', timeout: 30000, maxBuffer: 1024 * 1024, shell: false, windowsHide: true, env: codex.environment || nativeEnvironment() });
     if (result.status !== 0) throw new Error('Native schema export failed');
     const request = JSON.parse(await readFile(join(dir, 'ClientRequest.json'), 'utf8'));
     const methods = new Set();

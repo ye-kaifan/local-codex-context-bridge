@@ -2,7 +2,7 @@
 
 | Symptom | Check and action |
 | --- | --- |
-| `codex` not found / Windows spawn fails | Use the official native binary and its absolute path. Windows `.cmd` shims are unsupported. GUI services have a different PATH; regenerate config after a binary path changes. |
+| `codex` not found / Windows spawn fails | Use the official native binary and its absolute path. Windows `.cmd` shims are unsupported. GUI services have a different PATH. Legacy pins need deliberate migration; new stable-path/package selectors re-resolve on reader restart. See [executable upgrades](executable-updates.md). |
 | Setup says `EEXIST` | Existing configuration is protected. Inspect it and use a fresh `--out` directory; do not overwrite a running installation. |
 | No expected sessions | Check OS account, `CODEX_HOME` and the intended device. Filters may exclude archives/subagents. Do not inspect raw storage to bypass policy. |
 | Source unavailable | Report that device as unavailable; do not claim no matches or substitute another computer's history. |
@@ -26,3 +26,9 @@
 Keep diagnostics private. A useful public issue contains OS/architecture, Node/Codex
 versions, sanitized error class and synthetic reproduction—not a session transcript,
 configuration file, Tunnel ID, account ID or screenshot containing credentials.
+
+If an upgrade removes a selected executable, do not substitute an arbitrary newer
+folder or retry failed history pages invisibly. Discovery failure before launch may
+recover on a later explicit read. After a native process/protocol failure, restart
+only this reader once the selected source is repaired. A private Windows supervisor
+with a stale desktop-app path must be fixed separately.

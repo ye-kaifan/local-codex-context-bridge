@@ -10,6 +10,13 @@ shim cannot be spawned directly by this reader. If necessary inspect the install
 `@openai/codex-*` package's vendor directory, then run that exact binary with
 `--version` and `app-server --help` before passing it to setup.
 
+For a registered package CLI, `--follow-updates` records the exact current-user
+package family plus relative CLI path instead of the versioned install directory.
+It does not watch or launch the desktop app. Hashed standalone runtime directories
+without a stable alias still require manual path updates. See
+[executable upgrades](../docs/executable-updates.md) before migrating an existing
+strict pin; keep its home, credentials and local isolation unchanged.
+
 For LOCAL Codex isolation, follow [INSTALL.md section 5](../INSTALL.md#5-isolate-the-reader-from-codexs-native-tools).
 Disable only this reader's local plugin, related device connectors and bundled
 skills; keep ordinary Chat/Dot connections and the background task/reader running.
@@ -44,8 +51,11 @@ Create a task in **Task Scheduler**, scoped to that same user, triggered at logo
 with an absolute executable and working directory. Do not require elevation, copy
 the key into task arguments, or use a machine-wide service account. Use the official
 tunnel-client background guidance for your installed version. Configure a wrapper
-that watches the actual desktop executable path and current Windows session if
-app-coupled start/stop is required. Do not guess the app name or stop unrelated Node
+that identifies the actual desktop app and current Windows session if
+app-coupled start/stop is required. Do not freeze a versioned WindowsApps path:
+resolve the verified current-user package family on each lifecycle check and handle
+missing/ambiguous/denied registration explicitly. This reader's CLI resolver does
+not update a private supervisor's desktop-app watcher. Do not guess the app name or stop unrelated Node
 or Codex processes. Test: app absent, launch, exit, restart and process cleanup.
 
 No Windows task installer or DPAPI reader is shipped in this release. These steps

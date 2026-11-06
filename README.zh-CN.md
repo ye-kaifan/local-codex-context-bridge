@@ -60,3 +60,7 @@ macOS Apple Silicon 已做真实原生读取验证。Windows 有共享代码和 
 `npm run check:native-schema` 会优先检查 `.local/device.json` 中实际配置的 Codex。使用其他配置目录时，加 `-- --config 配置目录/device.json`，避免误检 PATH 中另一份安装。
 
 维护者的 GitHub → Gitee 单向同步范围与故障恢复见 [镜像说明](docs/mirroring.md)。
+
+## 可执行文件升级
+
+新 PATH 安装保存所选稳定入口，不再固化符号链接指向的版本目录。已有配置和显式 `--codex`/`CODEX_EXE` 继续严格固定；只有添加 `--follow-updates` 才按当前用户的同一 Windows 注册包或原稳定路径跟随升级。不会扫描其他安装、切换 Codex home 或重放失败请求。原生进程已退出或协议失败时仍须重启读取器。迁移和验证步骤见 [升级说明](docs/executable-updates.md)。

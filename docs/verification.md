@@ -83,3 +83,18 @@ reload, open a genuinely new LOCAL Codex chat for native history, and separately
 exercise reader history in ordinary cloud Chat and Dot. Record passed, failed and
 not-run results separately. Older private results do not qualify the current change;
 cache paths that change on update require rediscovery and repeat verification.
+
+## Upgrade-aware executable selection coverage
+
+The upgrade regression suites cover stable symlink retargeting, saved-source
+isolation from later PATH/CODEX_HOME changes, strict legacy pins, current-user
+package-version changes, registered-root junctions, canonical containment, denied
+and invalid candidates, malformed metadata, bounded secret-free probes, shared
+schema selection, concurrent lazy start and close/discovery races. They also prove
+that failed native reads are not replayed or switched to a new manager mid-history.
+
+Windows registration data in these tests is synthetic. A real installed package
+upgrade, its schema compatibility and the private Windows app supervisor still
+require the target-computer acceptance checklist in
+[executable upgrades](executable-updates.md). POSIX symlink execution tests are
+skipped on Windows; Linux is not a supported native reader platform.

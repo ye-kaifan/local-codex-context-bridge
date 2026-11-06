@@ -1,5 +1,6 @@
 import { isAbsolute } from 'node:path';
 import { readFile } from 'node:fs/promises';
+import { validateExecutableSource } from './executable.mjs';
 
 function record(value, label) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`${label} must be an object`);
@@ -15,8 +16,13 @@ export function validateConfig(config) {
   if (config.offline_setup !== undefined && typeof config.offline_setup !== 'boolean') throw new Error('offline_setup must be boolean');
   if (config.native !== undefined) {
     record(config.native, 'native');
-    only(config.native, ['executable', 'codex_home']);
-    for (const value of Object.values(config.native)) {
+    only(config.native, ['executable', 'executable_source', 'codex_home']);
+    if (config.native.executable_source !== undefined) {
+      if (config.native.executable !== undefined) throw new Error('Choose executable or executable_source, not both');
+      if (!config.native.codex_home) throw new Error('Executable discovery requires a fixed codex_home');
+      validateExecutableSource(config.native.executable_source);
+    }
+    for (const value of [config.native.executable, config.native.codex_home].filter(value => value !== undefined)) {
       if (typeof value !== 'string' || !isAbsolute(value) || /[\0\r\n]/.test(value)) throw new Error('Native paths must be absolute paths on this device');
     }
   }

@@ -41,7 +41,7 @@ npm run setup -- --id laptop --label "My laptop"
 npm run smoke
 ```
 
-Setup creates a **new** `.local/` directory with `device.json`, `mcp.json` and `command.json`. It detects Node, resolves Codex from `PATH` or `CODEX_EXE`, honors `CODEX_HOME`, and refuses to overwrite an existing directory. Use `--out NEW_DIRECTORY` for another configuration; use `--codex ABSOLUTE_PATH` and `--codex-home ABSOLUTE_PATH` when detection is insufficient. On Windows, provide the native `codex.exe` if only an npm `.cmd` shim is on `PATH`.
+Setup creates a **new** `.local/` directory with `device.json`, `mcp.json` and `command.json`. It detects Node, resolves Codex from `PATH` or `CODEX_EXE`, honors `CODEX_HOME`, and refuses to overwrite an existing directory. Use `--out NEW_DIRECTORY` for another configuration; use `--codex ABSOLUTE_PATH` and `--codex-home ABSOLUTE_PATH` when detection is insufficient. On Windows, provide the native `codex.exe` if only an npm `.cmd` shim is on `PATH`. New PATH setups retain the selected stable path across symlink updates; explicit paths remain pinned. Use `--follow-updates` to opt a selected executable into registered Windows package updates or stable-path resolution. See [upgrade behavior and migration](docs/executable-updates.md).
 
 The generated `command.json` is the stdio command for your MCP client or Tunnel. Launch **Node directly**, never `npm start` behind MCP: npm's lifecycle output is not JSON-RPC. Local setup does not install a cloud plugin, start a background service, change Codex settings, or create credentials.
 

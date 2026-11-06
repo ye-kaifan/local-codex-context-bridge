@@ -49,6 +49,12 @@ The home existing is not proof it contains the intended sessions: verify a known
 session through the tools. Windows must use native `codex.exe`, not `codex.cmd`.
 See [Windows notes](windows/README.md).
 
+New PATH setups keep the chosen stable executable path. Explicit paths remain
+pinned. Add `--follow-updates` only when you want the selected executable to follow
+its current-user Windows package registration or stable symlink/app bundle path.
+Review the generated selector; existing configurations are never auto-migrated.
+See [upgrade selection, failure behavior and acceptance](docs/executable-updates.md).
+
 The schema check uses `.local/device.json` when present, so it checks the same
 executable selected by setup. With `--out NEW_DIRECTORY`, pass that configuration
 to both checks:
@@ -273,6 +279,8 @@ shipped; do not present Windows CI as proof of a working desktop service.
   it and verifies nothing else uses it.
 - Undo only the isolation entries introduced above, using recorded old values. A full
   backup restore is appropriate only if no later unrelated config edits would be lost.
+- For executable-path upgrades, follow [the safe migration checklist](docs/executable-updates.md).
+  Private Windows supervisors and their desktop-app paths require separate repair.
 - To update, retain the previous checkout/config until the new checkout passes local
   tests and private Chat/Dot acceptance. Regenerate commands with the new absolute path,
   rediscover versioned bundled skill paths and reverify section 5's local isolation,
